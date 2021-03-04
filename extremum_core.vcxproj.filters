@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="common.hpp" />
+    <ClInclude Include="logger.hpp">
+      <Filter>logger</Filter>
+    </ClInclude>
+    <ClInclude Include="pointers.hpp">
+      <Filter>pointers</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\all.hpp">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\fwddec.hpp">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\handle.hpp">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\module.hpp">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\pattern.hpp">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\pattern_batch.hpp">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\range.hpp">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\array.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\base.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\color.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\enums.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\extensible.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\fwddec.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\joaat.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\matrix.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\natives.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\net_game_event.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\node_list.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\ped_factory.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\player.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\ref_aware.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\script_handler.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\script_id.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\script_program.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\script_thread.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\tls_context.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\vector.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="function_types.hpp" />
+    <ClInclude Include="hooking\detour_hook.hpp">
+      <Filter>hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="hooking\hooking.hpp">
+      <Filter>hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="hooking\script_hook.hpp">
+      <Filter>hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="hooking\vmt_hook.hpp">
+      <Filter>hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="script_mgr\script_mgr.hpp">
+      <Filter>script_mgr</Filter>
+    </ClInclude>
+    <ClInclude Include="script\script.hpp">
+      <Filter>script</Filter>
+    </ClInclude>
+    <ClInclude Include="natives\invoker.hpp">
+      <Filter>natives</Filter>
+    </ClInclude>
+    <ClInclude Include="natives\natives.hpp">
+      <Filter>natives</Filter>
+    </ClInclude>
+    <ClInclude Include="natives\crossmap.hpp">
+      <Filter>natives</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\gui.hpp">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="script\script_global.hpp">
+      <Filter>script</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\renderer.hpp">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="fonts\fonts.hpp">
+      <Filter>fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="features\features.hpp">
+      <Filter>features</Filter>
+    </ClInclude>
+    <ClInclude Include="script_mgr\fiber_pool.hpp">
+      <Filter>script_mgr</Filter>
+    </ClInclude>
+    <ClInclude Include="gta_util.hpp" />
+    <ClInclude Include="StackWalker\StackWalker.h">
+      <Filter>StackWalker</Filter>
+    </ClInclude>
+    <ClInclude Include="native_ui.hpp">
+      <Filter>native_ui</Filter>
+    </ClInclude>
+    <ClInclude Include="player_functions.hpp">
+      <Filter>option</Filter>
+    </ClInclude>
+    <ClInclude Include="native_drawable.hpp">
+      <Filter>native_ui\button</Filter>
+    </ClInclude>
+    <ClInclude Include="classes\vector3\vector3_c.h">
+      <Filter>classes\vector3</Filter>
+    </ClInclude>
+    <ClInclude Include="menu\selfoptions.hpp">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.hpp" />
+    <ClInclude Include="translation\translate.hpp">
+      <Filter>translation</Filter>
+    </ClInclude>
+    <ClInclude Include="massives\vehicles.hpp">
+      <Filter>massives</Filter>
+    </ClInclude>
+    <ClInclude Include="info_structs\vehicle_info.hpp">
+      <Filter>info_structs</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="logger">
+      <UniqueIdentifier>{e12120c8-8dc2-41d7-bd42-78dae1ec31ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{75c84ae8-7e03-4558-83db-5ee0c4e9d252}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hooking">
+      <UniqueIdentifier>{3605eab7-a26c-4b01-98e1-f452753998fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pointers">
+      <UniqueIdentifier>{92803441-f763-4766-a562-b5e204f540f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{6cf05fbb-ccb5-4336-b02f-15342b56250b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gta">
+      <UniqueIdentifier>{34bc1b46-bd01-46e1-b18e-e92e3565c188}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script_mgr">
+      <UniqueIdentifier>{1b2afb4f-e771-4484-9c66-a301d7e6c8b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="script">
+      <UniqueIdentifier>{1a37ee88-474b-4751-8224-03b1262d6238}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="natives">
+      <UniqueIdentifier>{35254dd5-ad5d-4c89-b917-60b3ed09d622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gui">
+      <UniqueIdentifier>{8643ad87-c5c3-46f1-9c3b-23e98629854e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="renderer">
+      <UniqueIdentifier>{a6ea6ffc-4def-47b8-9d0d-6e179ee02b1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fonts">
+      <UniqueIdentifier>{975ce9fd-ac13-4bc9-bef0-dcd5a4347bdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features">
+      <UniqueIdentifier>{49fdcdc8-d0c4-4b6e-a046-f4eca9805a1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StackWalker">
+      <UniqueIdentifier>{ac0050fa-8495-427d-beb9-0280fc0cda3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="native_ui">
+      <UniqueIdentifier>{e7bf5e47-1862-45e4-b56c-c11193d1a2d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="option">
+      <UniqueIdentifier>{8fcdaab1-c3cd-496e-b102-e932bc32c762}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="option_mgr">
+      <UniqueIdentifier>{578d6c71-cc8b-4554-8910-89b3b9725dee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="native_ui\button">
+      <UniqueIdentifier>{992cf6e0-8638-4186-be2b-dad68cf77ffd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes">
+      <UniqueIdentifier>{a19ee9c9-d946-4194-99f8-4db8592711f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\gta">
+      <UniqueIdentifier>{27915431-1da5-42cb-a175-fe6fddb4b7ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\gta\ped">
+      <UniqueIdentifier>{7e26a30f-132e-4c63-977d-f9e5fe1cd056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\gta\entity">
+      <UniqueIdentifier>{7580cd9b-6a19-4297-bf20-967ea2b784ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\gta\blip">
+      <UniqueIdentifier>{c89b6146-45ff-4906-a704-24330ceb3c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\vector3">
+      <UniqueIdentifier>{a1019c6a-7d4b-4483-8b7f-d5c00eb7fc6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\gta\model">
+      <UniqueIdentifier>{128fe9c4-c039-48eb-b32b-071d24a0d749}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu">
+      <UniqueIdentifier>{f1c7313d-ab3f-48f5-bb94-e019ad4c3cfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="translation">
+      <UniqueIdentifier>{82edd481-a7bb-459d-be09-0593777bb5a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="massives">
+      <UniqueIdentifier>{1a21688b-9f7b-478c-8daf-66c2da14325a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="info_structs">
+      <UniqueIdentifier>{666be625-9b21-409b-b6d3-413038e1ca93}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="pointers.cpp">
+      <Filter>pointers</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\module.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\pattern.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\pattern_batch.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\range.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="hooking\detour_hook.cpp">
+      <Filter>hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="hooking\hooking.cpp">
+      <Filter>hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="hooking\script_hook.cpp">
+      <Filter>hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="hooking\vmt_hook.cpp">
+      <Filter>hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="script_mgr\script_mgr.cpp">
+      <Filter>script_mgr</Filter>
+    </ClCompile>
+    <ClCompile Include="script\script.cpp">
+      <Filter>script</Filter>
+    </ClCompile>
+    <ClCompile Include="natives\invoker.cpp">
+      <Filter>natives</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\gui.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="script\script_global.cpp">
+      <Filter>script</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\renderer.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="fonts\fonts.cpp">
+      <Filter>fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="features\features.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="script_mgr\fiber_pool.cpp">
+      <Filter>script_mgr</Filter>
+    </ClCompile>
+    <ClCompile Include="StackWalker\StackWalker.cpp">
+      <Filter>StackWalker</Filter>
+    </ClCompile>
+    <ClCompile Include="classes\vector3\vector3_c.cpp">
+      <Filter>classes\vector3</Filter>
+    </ClCompile>
+    <ClCompile Include="menu\selfoptions.cpp" />
+    <ClCompile Include="translation\translate.cpp">
+      <Filter>translation</Filter>
+    </ClCompile>
+    <ClCompile Include="massives\vehicles.cpp">
+      <Filter>massives</Filter>
+    </ClCompile>
+    <ClCompile Include="info_structs\vehicle_info.cpp">
+      <Filter>info_structs</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

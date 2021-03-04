@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8f82f5e9-644a-44e8-b0cc-2ef4b5b93369}</ProjectGuid>
+    <RootNamespace>extremumcore</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4100;4201;4307;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="classes\vector3\vector3_c.h" />
+    <ClInclude Include="common.hpp" />
+    <ClInclude Include="features\features.hpp" />
+    <ClInclude Include="fonts\fonts.hpp" />
+    <ClInclude Include="function_types.hpp" />
+    <ClInclude Include="globals.hpp" />
+    <ClInclude Include="gta\array.hpp" />
+    <ClInclude Include="gta\base.hpp" />
+    <ClInclude Include="gta\color.hpp" />
+    <ClInclude Include="gta\enums.hpp" />
+    <ClInclude Include="gta\extensible.hpp" />
+    <ClInclude Include="gta\fwddec.hpp" />
+    <ClInclude Include="gta\joaat.hpp" />
+    <ClInclude Include="gta\matrix.hpp" />
+    <ClInclude Include="gta\natives.hpp" />
+    <ClInclude Include="gta\net_game_event.hpp" />
+    <ClInclude Include="gta\node_list.hpp" />
+    <ClInclude Include="gta\ped_factory.hpp" />
+    <ClInclude Include="gta\player.hpp" />
+    <ClInclude Include="gta\ref_aware.hpp" />
+    <ClInclude Include="gta\script_handler.hpp" />
+    <ClInclude Include="gta\script_id.hpp" />
+    <ClInclude Include="gta\script_program.hpp" />
+    <ClInclude Include="gta\script_thread.hpp" />
+    <ClInclude Include="gta\tls_context.hpp" />
+    <ClInclude Include="gta\vector.hpp" />
+    <ClInclude Include="gta_util.hpp" />
+    <ClInclude Include="gui\gui.hpp" />
+    <ClInclude Include="hooking\detour_hook.hpp" />
+    <ClInclude Include="hooking\hooking.hpp" />
+    <ClInclude Include="hooking\script_hook.hpp" />
+    <ClInclude Include="hooking\vmt_hook.hpp" />
+    <ClInclude Include="info_structs\vehicle_info.hpp" />
+    <ClInclude Include="logger.hpp" />
+    <ClInclude Include="massives\vehicles.hpp" />
+    <ClInclude Include="memory\all.hpp" />
+    <ClInclude Include="memory\fwddec.hpp" />
+    <ClInclude Include="memory\handle.hpp" />
+    <ClInclude Include="memory\module.hpp" />
+    <ClInclude Include="memory\pattern.hpp" />
+    <ClInclude Include="memory\pattern_batch.hpp" />
+    <ClInclude Include="memory\range.hpp" />
+    <ClInclude Include="menu\selfoptions.hpp" />
+    <ClInclude Include="natives\crossmap.hpp" />
+    <ClInclude Include="natives\invoker.hpp" />
+    <ClInclude Include="natives\natives.hpp" />
+    <ClInclude Include="native_drawable.hpp" />
+    <ClInclude Include="native_ui.hpp" />
+    <ClInclude Include="player_functions.hpp" />
+    <ClInclude Include="pointers.hpp" />
+    <ClInclude Include="renderer\renderer.hpp" />
+    <ClInclude Include="script\script.hpp" />
+    <ClInclude Include="script\script_global.hpp" />
+    <ClInclude Include="script_mgr\fiber_pool.hpp" />
+    <ClInclude Include="script_mgr\script_mgr.hpp" />
+    <ClInclude Include="StackWalker\StackWalker.h" />
+    <ClInclude Include="translation\translate.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="classes\vector3\vector3_c.cpp" />
+    <ClCompile Include="features\features.cpp" />
+    <ClCompile Include="fonts\fonts.cpp" />
+    <ClCompile Include="gui\gui.cpp" />
+    <ClCompile Include="hooking\detour_hook.cpp" />
+    <ClCompile Include="hooking\hooking.cpp" />
+    <ClCompile Include="hooking\script_hook.cpp" />
+    <ClCompile Include="hooking\vmt_hook.cpp" />
+    <ClCompile Include="info_structs\vehicle_info.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="massives\vehicles.cpp" />
+    <ClCompile Include="memory\module.cpp" />
+    <ClCompile Include="memory\pattern.cpp" />
+    <ClCompile Include="memory\pattern_batch.cpp" />
+    <ClCompile Include="memory\range.cpp" />
+    <ClCompile Include="menu\selfoptions.cpp" />
+    <ClCompile Include="natives\invoker.cpp" />
+    <ClCompile Include="pointers.cpp" />
+    <ClCompile Include="renderer\renderer.cpp" />
+    <ClCompile Include="script\script.cpp" />
+    <ClCompile Include="script\script_global.cpp" />
+    <ClCompile Include="script_mgr\fiber_pool.cpp" />
+    <ClCompile Include="script_mgr\script_mgr.cpp" />
+    <ClCompile Include="StackWalker\StackWalker.cpp" />
+    <ClCompile Include="translation\translate.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

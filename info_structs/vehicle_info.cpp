@@ -1,0 +1,1 @@
+﻿#include "vehicle_info.hpp"
