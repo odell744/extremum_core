@@ -5,9 +5,11 @@
 
 namespace extremum
 {
-	namespace globals
+	namespace global
 	{
-		void update_globals();
+		class GlobalVariables;
+		typedef std::unique_ptr<GlobalVariables> GlobalVariablesPtr_t;
+		
 
 		// variables
 		inline Ped m_local_ped{ 0 };
