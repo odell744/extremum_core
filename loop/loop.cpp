@@ -37,5 +37,15 @@ namespace extremum {
 			if (m_enable)
 				base::do_action();
 		}
+
+		void_loop::void_loop(std::string&& name, base::function_type&& action)
+			:
+			base(std::move(name), std::move(action))
+		{
+		}
+		void void_loop::tick()
+		{
+			base::do_action();
+		}
 	}
 }

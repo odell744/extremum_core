@@ -32,6 +32,17 @@ namespace extremum
 			function_type			m_action;
 		};
 
+		class void_loop : base_loop<void_loop, void>
+		{
+		private:
+			using base = base_loop<void_loop, void>;
+		public:
+			void_loop(std::string&& name, base::function_type&& action);
+			~void_loop() = default;
+
+			void tick();
+		};
+
 		class bool_loop : base_loop<bool_loop, bool>
 		{
 		private:

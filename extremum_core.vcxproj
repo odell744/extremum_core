@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -155,7 +155,8 @@
     <ClInclude Include="features\features.hpp" />
     <ClInclude Include="fonts\fonts.hpp" />
     <ClInclude Include="function_types.hpp" />
-    <ClInclude Include="globals.hpp" />
+    <ClInclude Include="global.hpp" />
+    <ClInclude Include="globals\globals.hpp" />
     <ClInclude Include="gta\array.hpp" />
     <ClInclude Include="gta\base.hpp" />
     <ClInclude Include="gta\color.hpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="hooking\vmt_hook.hpp" />
     <ClInclude Include="info_structs\vehicle_info.hpp" />
     <ClInclude Include="logger.hpp" />
+    <ClInclude Include="loop\loop.hpp" />
     <ClInclude Include="massives\vehicles.hpp" />
     <ClInclude Include="memory\all.hpp" />
     <ClInclude Include="memory\fwddec.hpp" />
@@ -200,6 +202,7 @@
     <ClInclude Include="native_ui.hpp" />
     <ClInclude Include="player_functions.hpp" />
     <ClInclude Include="pointers.hpp" />
+    <ClInclude Include="remotes\remotes.hpp" />
     <ClInclude Include="renderer\renderer.hpp" />
     <ClInclude Include="script\script.hpp" />
     <ClInclude Include="script\script_global.hpp" />
@@ -212,12 +215,15 @@
     <ClCompile Include="classes\vector3\vector3_c.cpp" />
     <ClCompile Include="features\features.cpp" />
     <ClCompile Include="fonts\fonts.cpp" />
+    <ClCompile Include="global.cpp" />
+    <ClCompile Include="globals\globals.cpp" />
     <ClCompile Include="gui\gui.cpp" />
     <ClCompile Include="hooking\detour_hook.cpp" />
     <ClCompile Include="hooking\hooking.cpp" />
     <ClCompile Include="hooking\script_hook.cpp" />
     <ClCompile Include="hooking\vmt_hook.cpp" />
     <ClCompile Include="info_structs\vehicle_info.cpp" />
+    <ClCompile Include="loop\loop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="massives\vehicles.cpp" />
     <ClCompile Include="memory\module.cpp" />
@@ -227,6 +233,7 @@
     <ClCompile Include="menu\selfoptions.cpp" />
     <ClCompile Include="natives\invoker.cpp" />
     <ClCompile Include="pointers.cpp" />
+    <ClCompile Include="remotes\remotes.cpp" />
     <ClCompile Include="renderer\renderer.cpp" />
     <ClCompile Include="script\script.cpp" />
     <ClCompile Include="script\script_global.cpp" />

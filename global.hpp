@@ -2,20 +2,29 @@
 #define EXTREMUM_GLOBALS
 
 #include "common.hpp"
+#include "loop/loop.hpp"
 
 namespace extremum
 {
 	namespace global
 	{
-		class GlobalVariables;
-		typedef std::unique_ptr<GlobalVariables> GlobalVariablesPtr_t;
-		
+		class global_variables;
+		typedef global_variables* global_variables_ptr_t;
+		class global_variables : public extremum::core::void_loop
+		{
+		public:
+			global_variables();
+			~global_variables();
 
-		// variables
-		inline Ped m_local_ped{ 0 };
-		inline Vehicle m_local_vehicle{ 0 };
-		// booleans
-		inline bool m_is_in_vehicle{ false };
+			void tick();
+		private:
+			Ped m_local_ped{ 0 };
+			Vehicle m_local_vehicle{ 0 };
+			// booleans
+			bool m_is_in_vehicle{ false };
+		};
+		
+		global_variables_ptr_t	g_global_variables;
 	}
 }
 

@@ -154,7 +154,6 @@
     <ClInclude Include="menu\selfoptions.hpp">
       <Filter>menu</Filter>
     </ClInclude>
-    <ClInclude Include="globals.hpp" />
     <ClInclude Include="translation\translate.hpp">
       <Filter>translation</Filter>
     </ClInclude>
@@ -163,6 +162,16 @@
     </ClInclude>
     <ClInclude Include="info_structs\vehicle_info.hpp">
       <Filter>info_structs</Filter>
+    </ClInclude>
+    <ClInclude Include="global.hpp" />
+    <ClInclude Include="loop\loop.hpp">
+      <Filter>loop</Filter>
+    </ClInclude>
+    <ClInclude Include="globals\globals.hpp">
+      <Filter>globals</Filter>
+    </ClInclude>
+    <ClInclude Include="remotes\remotes.hpp">
+      <Filter>remotes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +262,15 @@
     <Filter Include="info_structs">
       <UniqueIdentifier>{666be625-9b21-409b-b6d3-413038e1ca93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="loop">
+      <UniqueIdentifier>{9ea20861-c12e-46f9-a3aa-a221db472e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="globals">
+      <UniqueIdentifier>{8a0852d8-0f39-4d78-b926-dce1afb5b394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="remotes">
+      <UniqueIdentifier>{95f31f86-aa72-4fd3-9560-3e02beb9f20c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -327,6 +345,15 @@
     </ClCompile>
     <ClCompile Include="info_structs\vehicle_info.cpp">
       <Filter>info_structs</Filter>
+    </ClCompile>
+    <ClCompile Include="loop\loop.cpp">
+      <Filter>loop</Filter>
+    </ClCompile>
+    <ClCompile Include="globals\globals.cpp">
+      <Filter>globals</Filter>
+    </ClCompile>
+    <ClCompile Include="remotes\remotes.cpp">
+      <Filter>remotes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
