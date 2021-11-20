@@ -8,10 +8,10 @@ namespace extremum
 {
 	namespace global
 	{
-		class global_variables;
-		typedef global_variables* global_variables_ptr_t;
 		class global_variables : public extremum::core::void_loop
 		{
+		private:
+			using base = extremum::core::void_loop;
 		public:
 			global_variables();
 			~global_variables();
@@ -24,6 +24,8 @@ namespace extremum
 			bool m_is_in_vehicle{ false };
 		};
 		
+		typedef global_variables* global_variables_ptr_t;
+
 		global_variables_ptr_t	g_global_variables;
 	}
 }

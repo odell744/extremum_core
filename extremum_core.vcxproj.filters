@@ -173,6 +173,18 @@
     <ClInclude Include="remotes\remotes.hpp">
       <Filter>remotes</Filter>
     </ClInclude>
+    <ClInclude Include="gta\invite.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\net_object_mgr.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\structs.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
+    <ClInclude Include="gta\replay.hpp">
+      <Filter>gta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="logger">
@@ -355,5 +367,6 @@
     <ClCompile Include="remotes\remotes.cpp">
       <Filter>remotes</Filter>
     </ClCompile>
+    <ClCompile Include="global.cpp" />
   </ItemGroup>
 </Project>

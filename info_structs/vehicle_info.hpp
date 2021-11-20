@@ -31,11 +31,9 @@ namespace extremum::menu {
 			VEHICLE_CLASS_TRAIN,
 			VEHICLE_CLASS_OPEN_WHEEL
 		};
-
 		enum vehicle_dlc {
 			VEHICLE_DLC_NONE,
 		};
-
 		struct vehicle_info {
 			std::uint32_t	m_hash;
 			std::string		m_rage_name;
