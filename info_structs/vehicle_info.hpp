@@ -45,6 +45,7 @@ namespace extremum::menu {
 			struct ByName; 
 			struct ByClass;
 			struct ByDLC;
+			struct IndexByName;
 		};
 	};
 };

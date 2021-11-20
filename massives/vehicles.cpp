@@ -29,7 +29,7 @@ namespace extremum::menu {
 			return m_vehicles.get<vehicle_info::ByClass>();
 		}
 
-		const vehicles_array::vehicle_array_t vehicles_array::m_vehicles{
+		const vehicles_array::vehicle_array_t vehicles_array::m_vehicles {
 			{ RAGE_JOAAT_IMPL("blista"), "blista", "Dinka Blista", VEHICLE_CLASS_COMPACT, VEHICLE_DLC_NONE },
 			{ RAGE_JOAAT_IMPL("brioso"), "brioso", "Grotti Brioso R/A", VEHICLE_CLASS_COMPACT, VEHICLE_DLC_NONE },
 			{ RAGE_JOAAT_IMPL("dilettante"), "dilettante", "Karin Dilettante", VEHICLE_CLASS_COMPACT, VEHICLE_DLC_NONE },

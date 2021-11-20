@@ -30,6 +30,10 @@ namespace extremum::menu {
 					ordered_non_unique<
 						tag<vehicle_info::ByClass>,
 						member<vehicle_info, vehicle_classes, &vehicle_info::m_class>
+					>,
+					ordered_unique<
+						tag<vehicle_info::IndexByName>,
+						member<vehicle_info, std::string, &vehicle_info::m_name>
 					>
 				>
 			> vehicle_array_t;
