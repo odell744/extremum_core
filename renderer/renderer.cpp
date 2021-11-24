@@ -29,7 +29,7 @@ namespace extremum::core
 
 		ImGui::CreateContext();
 		ImGui_ImplDX11_Init(m_d3d_device.Get(), m_d3d_device_context.Get());
-		LOG_INFO("m_d3d_device {}", (uintptr_t)m_d3d_device.Get());
+		LOG_DEBUG("m_d3d_device {}", (uintptr_t)m_d3d_device.Get());
 		ImGui_ImplWin32_Init(g_pointers->m_hwnd);
 
 		ImFontConfig font_cfg{};
@@ -37,7 +37,8 @@ namespace extremum::core
 		std::strcpy(font_cfg.Name, "Rubik");
 
 		m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 20.f, &font_cfg, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
-		m_font_startup = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 200.f, &font_cfg, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+		m_font_title = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 50.f, &font_cfg, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+		m_subtitle_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 30.f, &font_cfg, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 		m_monospace_font = ImGui::GetIO().Fonts->AddFontDefault();
 		g_gui.dx_init();
 		g_renderer = this;
@@ -54,6 +55,7 @@ namespace extremum::core
 	}
 
 	void renderer::on_present()
+	try
 	{
 		if (g_gui.m_opened)
 		{
@@ -71,15 +73,16 @@ namespace extremum::core
 		ImGui::NewFrame();
 
 		g_gui.background_overlay();
-		if (!g_gui.m_startup_anim) {
-			if (g_gui.m_opened)
-				g_gui.dx_on_tick();
-			else
-				g_gui.dx_on_disable();
-		}
+
+		if (g_gui.m_opened)
+			g_gui.dx_on_tick();
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
+	catch (const std::exception& exception)
+	{
+		LOG_ERROR("d3d {}", exception.what());
 	}
 
 	void renderer::pre_reset()

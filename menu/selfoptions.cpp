@@ -7,7 +7,7 @@ namespace extremum::menu::selfoptions
 {
 	void submenu_selfoptions()
 	{
-		g_gui.menu_option("personalGlobals", core::personal_globals);
+		/*g_gui.menu_option("personalGlobals", core::personal_globals);
 		g_gui.menu_option("wantedLevelOptions", core::wanted_level_options);
 		g_gui.menu_option("noclipOptions", core::noclip_options);
 		g_gui.menu_option("freeCameraOptions", core::freecamera_options);
@@ -21,7 +21,7 @@ namespace extremum::menu::selfoptions
 		g_gui.menu_option("particleEffects", core::particle_effects);
 		g_gui.menu_option("cutscenes", core::cutscenes);
 		g_gui.menu_option("autoFunctions", core::auto_functions);
-		g_gui.menu_option("localNameChanger", core::local_name_changer);
+		g_gui.menu_option("localNameChanger", core::local_name_changer);*/
 	}
 	void submenu_personal_globals()
 	{

@@ -18,7 +18,8 @@ namespace extremum::core
 		void wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	public:
 		ImFont *m_font;
-		ImFont *m_font_startup;
+		ImFont *m_font_title;
+		ImFont* m_subtitle_font;
 		ImFont *m_monospace_font;
 
 		comptr<ID3D11Device> m_d3d_device;

@@ -138,6 +138,19 @@ namespace extremum
 		}
 
 		template <typename ...Args>
+		inline void log_debug(std::string_view format, Args const&...args)
+		{
+			if (g_logger)
+			{
+				g_logger->log(log_color::blue | log_color::intensify, "Debug", format, args...);
+			}
+			else
+			{
+				DebugBreak();
+			}
+		}
+
+		template <typename ...Args>
 		inline void log_error(std::string_view format, Args const&...args)
 		{
 			if (g_logger)
@@ -177,6 +190,15 @@ namespace extremum
 		}
 	}
 }
+#ifdef _DEBUG
+#define LOG_DEBUG_IMPL(format, ...) (::extremum::core::log_debug(format, __VA_ARGS__))
+#define LOG_DEBUG(format, ...) LOG_DEBUG_IMPL(format, __VA_ARGS__)
+#endif
+#ifndef _DEBUG
+#define LOG_DEBUG_IMPL(...)	
+#define LOG_DEBUG(...)
+#endif
+
 #define LOG_INFO_IMPL(format, ...) (::extremum::core::log_info(format, __VA_ARGS__))
 #define LOG_INFO(format, ...) LOG_INFO_IMPL(format, __VA_ARGS__)
 

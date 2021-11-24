@@ -73,13 +73,10 @@
 
 using namespace std::chrono_literals;
 
-
-#define EXTREMUM_CHEAT_VER 1.8
-#define EXTREMUM_CHEAT_VER_TXT "1.8"
-#define EXTREMUM_DEVELOPER "Jason"
+constexpr const char* g_cheat_version = "1.0";
+constexpr const char* g_cheat_author = "MSTRBRS";
 
 #define iskeypressed(key)	GetAsyncKeyState(key) & 0x8000
-
 
 namespace extremum {
 	namespace core {

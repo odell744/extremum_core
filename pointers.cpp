@@ -11,7 +11,7 @@ namespace extremum
 		{
 			memory::pattern_batch main_batch;
 
-			main_batch.add("Game state", "83 3D ? ? ? ? ? 75 17 8B 42 20 25", [this](memory::handle ptr)
+			main_batch.add("Game state", "83 3D ? ? ? ? ? 75 17 8B 43 20", [this](memory::handle ptr)
 				{
 					m_game_state = ptr.add(2).rip().as<eGameState*>();
 				});
@@ -67,6 +67,12 @@ namespace extremum
 				{
 					m_swapchain = ptr.add(3).rip().as<IDXGISwapChain**>();
 				});
+
+			main_batch.add("Model Spawn Bypass", "48 8B C8 FF 52 30 84 C0 74 05 48", [this](memory::handle ptr)
+				{
+					m_model_spawn_bypass = ptr.add(8).as<PVOID>();
+				});
+
 
 			main_batch.add("WorldToScreen", "48 89 5C 24 ? 55 56 57 48 83 EC 70 65 4C 8B 0C 25", [this](memory::handle ptr)
 				{

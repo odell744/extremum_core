@@ -25,23 +25,102 @@
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 
+#define START_MENU m_menu
+#define END_MENU ;
+#define ADD_SUBMENU(name, desc) .add_submenu(name, desc)
+#define END_SUBMENU .end_submenu()
+#define ADD_OPTION(name, desc) .add_option(name, desc)
+#define END_OPTION .end_option()
+#define ADD_HANDLER(handler) .add_handler(handler)
+#define ADD_SETTING(name, desc) .add_setting(name, desc)
+#define END_SETTING .end_setting()
+#define ADD_ACTION_HANDLER(action) ADD_HANDLER(std::make_unique<action_handler_t>(action))
+#define ADD_BOOL_HANDLER(var) ADD_HANDLER(std::make_unique<bool_handler_t>(var))
+#define ADD_INT32_HANDLER(var) ADD_HANDLER(std::make_unique<int32_handler_t>(var))
+#define ADD_UINT32_HANDLER(var) ADD_HANDLER(std::make_unique<uint32_handler_t>(var))
+#define ADD_INT64_HANDLER(var) ADD_HANDLER(std::make_unique<int64_handler_t>(var))
+#define ADD_FLOAT_HANDLER(var) ADD_HANDLER(std::make_unique<float_handler_t>(var))
+#define ADD_DOUBLE_HANDLER(var) ADD_HANDLER(std::make_unique<double_handler_t>(var))
+
+
 char buffer[0x24]{};
 
 namespace extremum::core
 {
+	template<typename Handler>
+	inline option_setting& option_setting::add_handler(std::unique_ptr<Handler>&& handler)
+	{
+		m_option_handler = std::move(handler);
+		return *this;
+	}
+	template<typename Handler>
+	inline option& option::add_handler(std::unique_ptr<Handler>&& handler)
+	{
+		m_option_handler = std::move(handler);
+		return *this;
+	}
+
+	menu::menu() {};
+	submenu::submenu(const std::uint32_t& id, const std::string& name, const std::string description, menu& handler)
+		:
+		m_id(id), m_name(name), m_description(description), m_handler_menu(handler)
+	{
+		LOG_DEBUG("submenu created [id: {}, name: {}, desc: {}]", m_id, m_name, m_description);
+	};
+	option::option(const std::uint32_t& id, const std::string& name, const std::string& description, submenu& handler)
+		:
+		m_id(id), m_name(name), m_description(description), m_handler_submenu(handler)
+	{
+		LOG_DEBUG("option created [id: {}, name: {}, desc: {}, handler_submenu_id: {}]", m_id, m_name, m_description, handler.id());
+	};
+	option_setting::option_setting(const std::uint32_t& id, const std::string& name, const std::string& description, option& handler)
+		:
+		m_id(id), m_name(name), m_description(description), m_handler_option(handler)
+	{
+		LOG_DEBUG("option_setting created [id: {}, name: {}, desc: {}, handler_option_id: {}]", m_id, m_name, m_description, handler.id());
+	};
+
+	bool option_setting::is_vip() { return m_is_vip; };
+	bool option::is_vip() { return m_is_vip; };
+	bool submenu::is_vip() { return m_is_vip; };
+
+	option_setting& option_setting::set_vip() { m_is_vip = true; return *this; };
+	option& option::set_vip() { m_is_vip = true; return *this; };
+	submenu& submenu::set_vip() { m_is_vip = true; return *this; };
+
+	option& option_setting::end_setting() { return m_handler_option; };
+	submenu& option::end_option() { return m_handler_submenu; };
+	menu& submenu::end_submenu() { return m_handler_menu; };
+
+	option_setting& option::add_setting(const std::string& name, const std::string& description)
+	{
+		m_settings.push_back(new option_setting(m_settings.size(), name, description, *this));
+		return *m_settings.back();
+	}
+	option& submenu::add_option(const std::string& name, const std::string& description)
+	{
+		m_options.push_back(new option(m_options.size(), name, description, *this));
+		return *m_options.back();
+	}
+	
+	submenu& menu::add_submenu(const std::string& name, const std::string& description)
+	{
+		m_submenus.push_back(new submenu(m_submenus.size(), name, description, *this));
+		return *m_submenus.back();
+	}
+
+	
+
 	void gui::init_textures()
 	{
-		LOG_INFO("loading textures");
-
 		static auto load_texture = [](std::filesystem::path texture_path) -> ID3D11ShaderResourceView* {
 			ID3D11ShaderResourceView* my_texture = NULL;
-			if (D3DX11CreateShaderResourceViewFromFile(g_renderer->m_d3d_device.Get(), texture_path.string().c_str(), NULL, NULL, &my_texture, NULL) != S_OK) {
+			if (D3DX11CreateShaderResourceViewFromFileA(g_renderer->m_d3d_device.Get(), texture_path.string().c_str(), NULL, NULL, &my_texture, NULL) != S_OK) {
 				LOG_INFO("Failed to initialize texture {}\n", texture_path.string());
 				return nullptr;
 			}
 			return my_texture;
 		};
-
 		static auto load_textures_from_path = [](std::filesystem::path dir_path, std::vector<ID3D11ShaderResourceView*>& container, std::string prefix, int fmt_int = 5, int offset = 0) {
 			int counter_files{ 0 };
 			for (const auto& file : std::filesystem::directory_iterator(dir_path))
@@ -65,294 +144,187 @@ namespace extremum::core
 				}
 			}
 		};
-
-		std::filesystem::path standard = "C:\\EXFiles\\UIDesign\\UIDesign\\BGDesign\\Standard";
-		std::filesystem::path exclusive = "C:\\EXFiles\\UIDesign\\UIDesign\\BGDesign\\Exclusive";
-		std::filesystem::path vip = "C:\\EXFiles\\UIDesign\\UIDesign\\BGDesign\\Vip";
-		std::filesystem::path toggle = "C:\\EXFiles\\UIDesign\\UIDesign\\Elements\\Toggle";
-		std::filesystem::path icons = "C:\\EXFiles\\UIDesign\\UIDesign\\Elements\\Icons";
-		std::filesystem::path menu_icons = "C:\\EXFiles\\UIDesign\\UIDesign\\Elements\\MenuIcons";
-
-
-		load_textures_from_path(standard, m_header_standard, "Standard_", 5, 1);
-		load_textures_from_path(exclusive, m_header_exclusive, "EXCLUSIVE_", 5);
-		load_textures_from_path(vip, m_header_vip, "VIP_", 5);
-		load_textures_from_path(toggle, m_toggle, "tumb_", 5);
-		load_textures_map_from_path(menu_icons, m_menu_icons_names, m_menu_icons);
-
-		m_header = &m_header_standard;
-
-		LOG_INFO("textures loaded");
 	}
 	void gui::dx_init()
 	{
-		auto &style = ImGui::GetStyle();
-		style.WindowPadding = { 0.f, 0.f };
-		style.PopupRounding = 0.f;
-		style.FramePadding = { 0.f, 0.f };
-		style.ItemSpacing = { 0.f, 0.f };
-		style.ItemInnerSpacing = { 6.f, 6.f };
-		style.TouchExtraPadding = { 0.f, 0.f };
-		style.IndentSpacing = 21.f;
-		style.ScrollbarSize = 15.f;
-		style.GrabMinSize = 8.f;
-		style.WindowBorderSize = 0.f;
-		style.ChildBorderSize = 0.f;
-		style.PopupBorderSize = 1.f;
-		style.FrameBorderSize = 0.f;
-		style.TabBorderSize = 0.f;
-		style.WindowRounding = 0.f;
-		style.ChildRounding = 0.f;
-		style.FrameRounding = 0.f;
-		style.ScrollbarRounding = 0.f;
-		style.GrabRounding = 0.f;
-		style.TabRounding = 0.f;
-		style.WindowTitleAlign = { 0.5f, 0.5f };
-		style.ButtonTextAlign = { 0.1f, 0.5f };
-		style.DisplaySafeAreaPadding = { 3.f, 3.f };
+		auto& io = ImGui::GetIO();
+		io.IniFilename = nullptr;
 
-		auto &colors = style.Colors;
-		colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-		colors[ImGuiCol_TextDisabled] = ImVec4(1.00f, 0.90f, 0.19f, 1.00f);
-		colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.6f);
-		colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-		colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-		colors[ImGuiCol_Border] = ImVec4(0.30f, 0.30f, 0.30f, 0.50f);
-		colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-		colors[ImGuiCol_FrameBg] = ImVec4(0.21f, 0.21f, 0.21f, 0.54f);
-		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.21f, 0.21f, 0.21f, 0.78f);
-		colors[ImGuiCol_FrameBgActive] = ImVec4(0.28f, 0.27f, 0.27f, 0.54f);
-		colors[ImGuiCol_TitleBg] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
-		colors[ImGuiCol_TitleBgActive] = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
-		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
-		colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-		colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-		colors[ImGuiCol_CheckMark] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-		colors[ImGuiCol_SliderGrab] = ImVec4(0.34f, 0.34f, 0.34f, 1.00f);
-		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.39f, 0.38f, 0.38f, 1.00f);
-		colors[ImGuiCol_Button] = ImVec4(0.06f, 0.06f, 0.06f, 0.05f);
-		colors[ImGuiCol_ButtonHovered] = ImVec4(0.06f, 0.06f, 0.06f, 0.05f);
-		colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.06f, 0.06f, 0.05f);
-		colors[ImGuiCol_Header] = ImVec4(0.37f, 0.37f, 0.37f, 0.31f);
-		colors[ImGuiCol_HeaderHovered] = ImVec4(1.f, 1.f, 1.f, 1.f);
-		colors[ImGuiCol_HeaderActive] = ImVec4(0.37f, 0.37f, 0.37f, 0.51f);
-		colors[ImGuiCol_Separator] = ImVec4(0.38f, 0.38f, 0.38f, 0.50f);
-		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.46f, 0.46f, 0.46f, 0.50f);
-		colors[ImGuiCol_SeparatorActive] = ImVec4(0.46f, 0.46f, 0.46f, 0.64f);
-		colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
-		colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-		colors[ImGuiCol_ResizeGripActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
-		colors[ImGuiCol_Tab] = ImVec4(0.21f, 0.21f, 0.21f, 0.86f);
-		colors[ImGuiCol_TabHovered] = ImVec4(0.27f, 0.27f, 0.27f, 0.86f);
-		colors[ImGuiCol_TabActive] = ImVec4(0.34f, 0.34f, 0.34f, 0.86f);
-		colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.10f, 0.10f, 0.97f);
-		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
-		colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-		colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-		colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-		colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-		colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-		colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+		auto& style = ImGui::GetStyle();
+		{
+			style.WindowPadding = { 0.f, 0.f };
+			style.PopupRounding = 0.f;
+			style.FramePadding = { 0.f, 0.f };
+			style.ItemSpacing = { 0.f, 0.f };
+			style.ItemInnerSpacing = { 6.f, 6.f };
+			style.TouchExtraPadding = { 0.f, 0.f };
+			style.IndentSpacing = 21.f;
+			style.ScrollbarSize = 15.f;
+			style.GrabMinSize = 8.f;
+			style.WindowBorderSize = 0.f;
+			style.ChildBorderSize = 0.f;
+			style.PopupBorderSize = 1.f;
+			style.FrameBorderSize = 0.f;
+			style.TabBorderSize = 0.f;
+			style.WindowRounding = 0.f;
+			style.ChildRounding = 0.f;
+			style.FrameRounding = 0.f;
+			style.ScrollbarRounding = 0.f;
+			style.GrabRounding = 0.f;
+			style.TabRounding = 0.f;
+			style.WindowTitleAlign = { 0.5f, 0.5f };
+			style.ButtonTextAlign = { 0.1f, 0.5f };
+			style.DisplaySafeAreaPadding = { 3.f, 3.f };
+
+			auto& colors = style.Colors;
+			colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+			colors[ImGuiCol_TextDisabled] = ImVec4(1.00f, 0.90f, 0.19f, 1.00f);
+			colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.6f);
+			colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+			colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+			colors[ImGuiCol_Border] = ImVec4(0.30f, 0.30f, 0.30f, 0.50f);
+			colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+			colors[ImGuiCol_FrameBg] = ImVec4(0.21f, 0.21f, 0.21f, 0.54f);
+			colors[ImGuiCol_FrameBgHovered] = ImVec4(0.21f, 0.21f, 0.21f, 0.78f);
+			colors[ImGuiCol_FrameBgActive] = ImVec4(0.28f, 0.27f, 0.27f, 0.54f);
+			colors[ImGuiCol_TitleBg] = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
+			colors[ImGuiCol_TitleBgActive] = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
+			colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+			colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+			colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+			colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+			colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+			colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+			colors[ImGuiCol_CheckMark] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+			colors[ImGuiCol_SliderGrab] = ImVec4(0.34f, 0.34f, 0.34f, 1.00f);
+			colors[ImGuiCol_SliderGrabActive] = ImVec4(0.39f, 0.38f, 0.38f, 1.00f);
+			colors[ImGuiCol_Button] = ImVec4(0.06f, 0.06f, 0.06f, 0.05f);
+			colors[ImGuiCol_ButtonHovered] = ImVec4(0.06f, 0.06f, 0.06f, 0.05f);
+			colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.06f, 0.06f, 0.05f);
+			colors[ImGuiCol_Header] = ImVec4(0.37f, 0.37f, 0.37f, 0.31f);
+			colors[ImGuiCol_HeaderHovered] = ImVec4(1.f, 1.f, 1.f, 1.f);
+			colors[ImGuiCol_HeaderActive] = ImVec4(0.37f, 0.37f, 0.37f, 0.51f);
+			colors[ImGuiCol_Separator] = ImVec4(0.38f, 0.38f, 0.38f, 0.50f);
+			colors[ImGuiCol_SeparatorHovered] = ImVec4(0.46f, 0.46f, 0.46f, 0.50f);
+			colors[ImGuiCol_SeparatorActive] = ImVec4(0.46f, 0.46f, 0.46f, 0.64f);
+			colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
+			colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+			colors[ImGuiCol_ResizeGripActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+			colors[ImGuiCol_Tab] = ImVec4(0.21f, 0.21f, 0.21f, 0.86f);
+			colors[ImGuiCol_TabHovered] = ImVec4(0.27f, 0.27f, 0.27f, 0.86f);
+			colors[ImGuiCol_TabActive] = ImVec4(0.34f, 0.34f, 0.34f, 0.86f);
+			colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.10f, 0.10f, 0.97f);
+			colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+			colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+			colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+			colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+			colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+			colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+			colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+			colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+			colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+			colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+		}
+		START_MENU
+			ADD_SUBMENU("mainMenu", "mainMenuDesc")
+
+				ADD_OPTION("versionText", "versionTextDsc")
+					ADD_ACTION_HANDLER([] {})
+				END_OPTION
+
+				ADD_OPTION("authorText", "authorTextDsc")
+					ADD_ACTION_HANDLER([] {})
+				END_OPTION
+
+			END_SUBMENU
+
+			ADD_SUBMENU("playerOptions", "playerOptionsDsc")
+
+				ADD_OPTION("option1", "dsc")
+					ADD_ACTION_HANDLER([] {})
+
+					ADD_SETTING("godModeSetting", "settingPlayer1Desc")
+						ADD_ACTION_HANDLER([] {})
+					END_SETTING
+					ADD_SETTING("godModeSetting2", "settingPlayer1Desc")
+						ADD_ACTION_HANDLER([] {})
+					END_SETTING
+				END_OPTION
+
+				ADD_OPTION("option2", "dsc")
+					ADD_ACTION_HANDLER([] {})
+					ADD_SETTING("option2Setting", "settingPlayer1Desc")
+						ADD_ACTION_HANDLER([] {})
+					END_SETTING
+				END_OPTION
+				ADD_OPTION("option3", "dsc")
+					ADD_ACTION_HANDLER([] {})
+				END_OPTION
+				ADD_OPTION("option4", "dsc")
+					ADD_ACTION_HANDLER([] {})
+				END_OPTION
+				ADD_OPTION("option5", "dsc")
+					ADD_ACTION_HANDLER([] {})
+				END_OPTION
+			END_SUBMENU
+		END_MENU
 	}
 	void gui::dx_on_tick()
+	try
 	{
-		ImGuiWindow* m_header_window{};
-		ImGuiWindow* m_option_window{};
-		ImGuiWindow* m_scroller_window{};
-		ImGuiWindow* m_footer_window{};
+		static ImVec2 start_position{}, diff{}, draw_position{ m_pos };
+		static bool window_moving{ false };
+		check_controlls();
 
-		static ImVec2 header_anim_size(400.f, 110.f);
-		static ImVec2 header_size(400.f, 135.f);
-		static ImVec2 menu_size(400.f, button_height * button_visible);
-		static ImVec2 fotter_size(400.f, 50.f);
-		ImVec2 header_pos;
-#pragma region HEADER_WINDOW
-		ImGui::SetNextWindowSize(header_size);
-		ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_WindowBg, ImVec4(0.06f, 0.06f, 0.06f, 0.9f));
-		if (ImGui::Begin("header", nullptr, ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoTitleBar))
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.1f));
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::SetNextWindowPos(draw_position);
+		ImGui::SetNextWindowSize(ImVec2(m_options_size.x, 
+								m_options_size.y + m_header_current_size.y + m_footer_current_size.y), ImGuiCond_Always);
+		if (ImGui::Begin("##draw_window", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
+			| ImGuiWindowFlags_NoResize))
 		{
-			m_header_window = ImGui::GetCurrentWindow();
-			header_pos = m_header_window->Pos;
+			slide_to(draw_position.x, m_pos.x);
+			slide_to(draw_position.y, m_pos.y);
 
-			static bool timer_reset = true;
-			static std::chrono::system_clock::time_point timer_Start;
-			static int idleFrame = 0;
-			if (m_header != nullptr) {
-				if (m_header->size() > 0) {
-					m_header_window->DrawList->AddImage((ImTextureID)m_header->at(idleFrame), ImVec2(header_pos.x, header_pos.y), ImVec2(header_pos.x + header_anim_size.x, header_pos.y + header_anim_size.y));
-					std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - timer_Start;
-					if (elapsed_seconds.count() >= 0.019)
-					{
-						idleFrame++;
-						if (idleFrame == m_header->size() - 1)
-							idleFrame = 0;
-						timer_Start = std::chrono::system_clock::now();
-					}
+			if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && !window_moving) {
+				auto mouse_pos = io.MousePos;
+				
+				if (mouse_pos.x >= draw_position.x && mouse_pos.x <= (draw_position.x + m_header_current_size.x)
+					&& mouse_pos.y >= draw_position.y && mouse_pos.y <= (draw_position.y + m_header_current_size.y))
+				{
+					window_moving = true;
+					start_position = draw_position;
+					diff = ImVec2(mouse_pos.x - draw_position.x, mouse_pos.y - draw_position.y);
 				}
 			}
-			std::string text_ = TRANSLATE(m_subtitles[m_current_menu]);
-			auto text_size = ImGui::CalcTextSize(text_.c_str());
-			ImGui::SetCursorPos({ header_size.x / 2 - text_size.x / 2, header_size.y - (header_size.y - header_anim_size.y) / 2 - text_size.y / 2});
-			ImGui::Text(text_.c_str());
-		}
-		ImGui::PopStyleColor();
-		ImGui::End();
-#pragma endregion
-#pragma region OPTION_WINDOW
-		ImGui::SetNextWindowPos(ImVec2(header_pos.x, header_pos.y + header_size.y));
-		ImGui::SetNextWindowSize(menu_size_visible);
-
-		static bool test_bool{ false };
-		static bool test_bool2{ false };
-		static bool test_bool3{ true };
-		static bool test_bool4{ true };
-		static bool test_bool5{ true };
-		if (ImGui::Begin("console", nullptr, ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoScrollbar))
-		{
-			m_option_window = ImGui::GetCurrentWindow();
-
-			static float slider_y{ 0.f };
-			ImVec2 p_min_slider{ m_option_window->Pos.x, m_option_window->Pos.y + slider_y };
-			ImVec2 p_max_slider{ m_option_window->Pos.x + m_option_window->Size.x, m_option_window->Pos.y + slider_y + button_height};
-			slide_to(slider_y, (m_current_button - 1) * button_height - ImGui::GetScrollY(), 15);
-
-			m_option_window->DrawList->AddRectFilled(p_min_slider, p_max_slider, IM_COL32(255, 255, 255, 255));
-
-			switch (m_current_menu)
-			{
-			case extremum::core::mainmenu: {
-				menu_option("selfOption", "mp_specitem_ped", extremum::core::self_options);
-				menu_option("protMenu", "mp_specitem_safe", extremum::core::protection_menu);
-				menu_option("onlinePlayers", "survival", extremum::core::online_players);
-				menu_option("networkOptions", "team_deathmatch", extremum::core::network_options);
-				menu_option("weaponOptions", "ammo_pickup", extremum::core::weapon_options);
-				menu_option("teleportOptions", "shooting_range", extremum::core::teleport_options);
-				menu_option("vehicleSpawnOptions", "mp_specitem_car", extremum::core::vehicle_spawn_options);
-				menu_option("vehicleOptions", "vehicle_deathmatch", extremum::core::vehicle_options);
-				menu_option("moneyOptions", "mp_specitem_cash", extremum::core::money_options);
-				menu_option("recoveryOptions", "mp_alerttriangle", extremum::core::recovery_options);
-				menu_option("spawnOptions", "mp_specitem_package", extremum::core::spawn_options);
-				menu_option("worldOptions", "mp_specitem_remote", extremum::core::world_options);
-				menu_option("extremumExclusive", "custom_mission", extremum::core::extremum_exclusive);
-				menu_option("gameplayOptions", "mp_specitem_meth", extremum::core::gameplay_options);
-				menu_option("menuSettings", "mp_specitem_keycard", extremum::core::menu_settings);
-			} break;
-			case extremum::core::self_options:									extremum::menu::selfoptions::submenu_selfoptions(); break;
-			case extremum::core::personal_globals:								extremum::menu::selfoptions::submenu_personal_globals(); break;
-			case extremum::core::wanted_level_options:							extremum::menu::selfoptions::submenu_wanted_level_options(); break;
-			case extremum::core::noclip_options:								extremum::menu::selfoptions::submenu_noclip_options(); break;
-			case extremum::core::freecamera_options:							extremum::menu::selfoptions::submenu_freecamera_options(); break;
-			case extremum::core::wardrobe_options:								extremum::menu::selfoptions::submenu_wardrobe_options(); break;
-			case extremum::core::ride_options:									extremum::menu::selfoptions::submenu_ride_options(); break;
-			case extremum::core::vision_effects_options:						extremum::menu::selfoptions::submenu_vision_effects_options(); break;
-			case extremum::core::models_changer:								extremum::menu::selfoptions::submenu_models_changer(); break;
-			case extremum::core::animations:									extremum::menu::selfoptions::submenu_animations(); break;
-			case extremum::core::scenarios:										extremum::menu::selfoptions::submenu_scenarios(); break;
-			case extremum::core::walk_styles:									extremum::menu::selfoptions::submenu_walk_styles(); break;
-			case extremum::core::particle_effects:								extremum::menu::selfoptions::submenu_particle_effects(); break;
-			case extremum::core::cutscenes:										extremum::menu::selfoptions::submenu_cutscenes(); break;
-			case extremum::core::auto_functions:								extremum::menu::selfoptions::submenu_auto_functions(); break;
-			case extremum::core::local_name_changer:							extremum::menu::selfoptions::submenu_local_name_changer(); break;
-			default:
-				button("not available", "current menu will be\navailable in future");
-				break;
+			else if (window_moving) {
+				auto mouse_pos = io.MousePos;
+				if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+					window_moving = false;
+				}
+				m_pos = ImVec2(mouse_pos.x - diff.x, mouse_pos.y - diff.y);
 			}
 
-			float button_level = m_current_button * button_height - button_height;
-			bool upper = m_option_window->Scroll.y > button_level;
-			bool lower = m_option_window->Scroll.y + button_height * button_visible <= button_level;
-			if (upper || lower)
-				m_option_window->Scroll = { ImGui::GetScrollX(), m_current_button * button_height - button_height };
-			if (ImGui::IsWindowHovered() || upper || lower)
-				ImGui::SetNextWindowScroll({ImGui::GetScrollX(), ImGui::GetScrollY()});
-		}
-		ImGui::End();
-#pragma endregion
-#pragma region DRAWING_SCROLLER
-		if (m_button_counter * button_height > menu_size_visible.y) {
-			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.f, 0.f, 0.f, 0.f));
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.06f, 0.06f, 0.06f, 0.05f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.f, 1.f, 1.f, 0.5f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.41f, 0.41f, 0.41f, 0.87f));
-			ImGui::SetNextWindowPos(ImVec2(header_pos.x - 45.f, header_pos.y + header_size.y));
-			ImGui::SetNextWindowSize(ImVec2(0.001f, menu_size_visible.y));
-			if (ImGui::Begin("scroller", nullptr, ImGuiWindowFlags_NoCollapse |
-				ImGuiWindowFlags_NoResize |
-				ImGuiWindowFlags_NoTitleBar)) {
-				m_scroller_window = ImGui::GetCurrentWindow();
-				for (int i = 0; i < m_button_counter; ++i)
-					ImGui::Button("", ImVec2(0.001f, button_height));
-
-				if (ImGui::IsWindowHovered())
-					m_option_window->Scroll = { ImGui::GetScrollX(), ImGui::GetScrollY() };
-			}
-			ImGui::End();
-			ImGui::PopStyleColor();
-			ImGui::PopStyleColor();
-			ImGui::PopStyleColor();
-			ImGui::PopStyleColor();
-		}
-#pragma endregion
-#pragma region DRAWING_FOTTER
-		ImGui::SetNextWindowPos(ImVec2(header_pos.x, header_pos.y + header_size.y + menu_size_visible.y));
-		ImGui::SetNextWindowSize(fotter_size);
-		ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_WindowBg, ImVec4(0.06f, 0.06f, 0.06f, 0.9f));
-		if (ImGui::Begin("footer", nullptr, ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoTitleBar))
-		{
-			std::string counter = fmt::format("{}/{}", m_current_button, m_button_counter);
-			std::string version = fmt::format("v{}", EXTREMUM_CHEAT_VER_TXT);
-			std::string developer = fmt::format("{}", EXTREMUM_DEVELOPER);
-
-			auto counter_size = ImGui::CalcTextSize(counter.c_str());
-			auto version_size = ImGui::CalcTextSize(version.c_str());
-			auto developer_size = ImGui::CalcTextSize(developer.c_str());
-
-			auto start_pos_x = ImGui::GetCursorPosX();
-			auto start_pos_y = ImGui::GetCursorPosY();
-
-			/// DEVELOPER
-			{
-				ImGui::SetCursorPosX(start_pos_x + 10.f);
-				ImGui::SetCursorPosY(start_pos_y + fotter_size.y / 2 - developer_size.y / 2);
-				ImGui::Text(developer.c_str());
-			}
-			/// COUNTER
-			{
-				ImGui::SetCursorPosX(start_pos_x + fotter_size.x / 2 - counter_size.x / 2);
-				ImGui::SetCursorPosY(start_pos_y + fotter_size.y / 2 - counter_size.y / 2);
-				ImGui::Text(counter.c_str());
-			}
-			/// VERSION
-			{
-				ImGui::SetCursorPosX(start_pos_x + fotter_size.x - 10.f - version_size.x);
-				ImGui::SetCursorPosY(start_pos_y + fotter_size.y / 2 - version_size.y / 2);
-				ImGui::Text(version.c_str());
-			}
+			calculate_sizes();
+			draw_header_window();
+			draw_options_window();
+			draw_submenus_window();
+			draw_settings_window();
+			draw_footer_window();
 		}
 		ImGui::End();
 		ImGui::PopStyleColor();
-#pragma endregion
-		m_pressed = m_back = m_left_pressed = m_right_pressed = m_up_pressed = m_down_pressed = false;
-		if (m_button_counter > button_visible && m_opened)
-			slide_to(menu_size_visible.y, menu_size.y);
-		else if (m_opened)
-			slide_to(menu_size_visible.y, button_height * m_button_counter);
-		if (!m_block_controlls)
-			check_controlls();
+		ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
+
+		reset_controlls();
+	}
+	catch (const std::exception& exception) {
+		LOG_ERROR("{}", exception.what());
 	}
 
 	void gui::script_init()
@@ -375,6 +347,336 @@ namespace extremum::core
 		}
 	}
 
+	void gui::calculate_sizes()
+	{
+		m_options_pos = ImVec2{ m_header_pos.x, m_header_pos.y + m_header_current_size.y };
+		m_submenus_pos.y = m_options_pos.y;
+		m_settings_pos.y = m_options_pos.y;
+		m_footer_pos.x = m_options_pos.x;
+		m_footer_pos.y = m_options_pos.y + m_options_size.y;
+
+		switch (m_menu.get_current_window())
+		{
+		case current_window::options:
+		{
+			if (m_option_count > 16 &&
+				m_menu.get_selected_submenu().selected_id() > 15)
+				m_header_expanded = false;
+			else {
+				m_header_expanded = true;
+			}
+			if (m_left_pressed) {
+				m_menu.set_current_window(current_window::submenus);
+			}
+			else if (m_right_pressed) {
+				auto settings = m_menu.get_selected_submenu().get_selected_option().get_settings();
+				if (!settings.empty())
+					m_menu.set_current_window(current_window::settings);
+			}
+
+			if (m_up_pressed) 
+			{
+				m_menu.get_selected_submenu().up();
+			}
+			else if (m_down_pressed)
+			{
+				m_menu.get_selected_submenu().down();
+			}
+			slide_to(m_submenus_pos.x, m_options_pos.x - m_submenus_size.x, 5);
+			slide_to(m_settings_pos.x, m_options_pos.x + m_options_size.x, 5);
+		} break;
+		case current_window::submenus:
+		{
+			m_header_expanded = true;
+			if (m_right_pressed) {
+				m_menu.set_current_window(current_window::options);
+			}
+
+			if (m_up_pressed)
+			{
+				m_menu.up();
+			}
+			else if (m_down_pressed)
+			{
+				m_menu.down();
+			}
+			slide_to(m_submenus_pos.x, m_options_pos.x);
+			slide_to(m_settings_pos.x, m_options_pos.x + m_options_size.x, 5);
+		} break;
+		case current_window::settings:
+		{
+			m_header_expanded = true;
+			if (m_left_pressed) {
+				m_menu.set_current_window(current_window::options);
+			}
+
+			if (m_up_pressed)
+			{
+				m_menu.get_selected_submenu().get_selected_option().up();
+			}
+			else if (m_down_pressed)
+			{
+				m_menu.get_selected_submenu().get_selected_option().down();
+			}
+			slide_to(m_submenus_pos.x, m_options_pos.x - m_submenus_size.x, 5);
+			slide_to(m_settings_pos.x, m_options_pos.x + m_options_size.x - m_settings_size.x);
+		} break;
+		}
+
+		if (m_header_expanded)
+		{
+			slide_to(m_header_current_size.x, m_header_max_size.x);
+			slide_to(m_header_current_size.y, m_header_max_size.y);
+		}
+		else {
+			slide_to(m_header_current_size.x, m_header_min_size.x);
+			slide_to(m_header_current_size.y, m_header_min_size.y);
+		}
+	}
+
+	void gui::draw_line(const ImVec2& p_min, const ImVec2& p_max, const ImVec4& color, float thickness)
+	{
+		auto window = ImGui::GetCurrentWindow();
+		auto& window_pos = window->Pos;
+
+		window->DrawList->AddLine(
+			ImVec2(window_pos.x + p_min.x, window_pos.y + p_min.y),
+			ImVec2(window_pos.x + p_max.x, window_pos.y + p_max.y),
+			ImColor(color),
+			thickness
+		);
+	}
+	void gui::draw_rect(const ImVec2& pos, const ImVec2& size, const ImVec4& color)
+	{
+		auto window = ImGui::GetCurrentWindow();
+		auto& window_pos = window->Pos;
+
+		window->DrawList->AddRectFilled(
+			ImVec2(window_pos.x + pos.x, window_pos.y + pos.y),
+			ImVec2(window_pos.x + pos.x + size.x, window_pos.y + pos.y + size.y),
+			ImColor(color),
+			0.f,
+			ImDrawCornerFlags_::ImDrawCornerFlags_None
+		);
+	}
+	void gui::draw_rect_rounded(const ImVec2& pos, const ImVec2& size, const ImVec4& color, float round)
+	{
+		auto window = ImGui::GetCurrentWindow();
+		auto& window_pos = window->Pos;
+
+		window->DrawList->AddRectFilled(
+			ImVec2(window_pos.x + pos.x, window_pos.y + pos.y),
+			ImVec2(window_pos.x + pos.x + size.x, window_pos.y + pos.y + size.y),
+			ImColor(color),
+			round);
+	}
+
+	void gui::draw_text(const std::string_view& text, const ImVec2& pos, const ImVec2& size, const ImVec4& color)
+	{
+		auto window = ImGui::GetCurrentWindow();
+
+		auto text_size = ImGui::CalcTextSize(text.data());
+		ImGui::SetCursorPos({ pos.x + 10.f, pos.y + size.y / 2 - text_size.y / 2});
+		ImGui::PushStyleColor(ImGuiCol_Text, color);
+		ImGui::Text(text.data());
+		ImGui::PopStyleColor();
+	}
+
+	ImVec4 gui::color_from_hex(std::uint32_t value, float alpha)
+	{
+		return ImVec4(((value & 0xFF0000) >> 16) / 255.f, ((value & 0x00FF00) >> 8) / 255.f, ((value & 0x0000FF) >> 0) / 255.f, alpha);
+	}
+
+	void gui::draw_footer_window()
+	{
+		draw_rect(m_footer_pos, m_footer_current_size, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+
+		ImVec2 author_text_size{ m_footer_current_size.x, m_options_size.y / block_delimeter };
+		ImVec2 author_text_pos{ m_footer_pos.x, m_footer_pos.y + m_footer_current_size.y - author_text_size.y };
+
+		draw_text(fmt::format("<{}/{}>", m_current_option + 1, m_option_count), author_text_pos, author_text_size);
+		draw_line(
+			m_footer_pos,
+			ImVec2(m_footer_pos.x + m_footer_current_size.x, m_footer_pos.y),
+			m_selected_color,
+			5.f);
+	}
+	void gui::draw_header_window()
+	{
+		static random_color_timed title_color{};
+		draw_rect(m_header_pos, m_header_current_size, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+
+		ImVec2 submenu_text_size{ m_header_current_size.x, m_options_size.y / block_delimeter };
+		ImVec2 submenu_text_pos{ m_header_pos.x, m_header_pos.y + m_header_current_size.y - submenu_text_size.y - 12.5f };
+		ImVec2 menu_text_size{ submenu_text_size.x, submenu_text_size.y * 2 };
+		ImVec2 menu_text_pos{ submenu_text_pos.x, submenu_text_pos.y - submenu_text_size.y * 2};
+
+		static ImVec4 menu_color{1.f, 1.f, 1.f, 1.f};
+		auto& end_color = title_color.get();
+
+		if (m_header_expanded)
+		{
+			slide_to(menu_color.x, end_color.x);
+			slide_to(menu_color.y, end_color.y);
+			slide_to(menu_color.z, end_color.z);
+			slide_to(menu_color.w, 1.f);
+		} else 
+		{
+			slide_to(menu_color.w, .0f);
+		}
+		ImGui::PushFont(g_renderer->m_font_title);
+		draw_text("SPIRIT MENU", menu_text_pos, menu_text_size, menu_color);
+		ImGui::PopFont();
+		ImGui::PushFont(g_renderer->m_subtitle_font);
+		draw_text(TRANSLATE(m_menu.get_selected_submenu().name()), submenu_text_pos, submenu_text_size, m_selected_color);
+		ImGui::PopFont();
+		draw_line(
+			ImVec2(m_header_pos.x, m_header_pos.y + m_header_current_size.y - 2.5f),
+			ImVec2(m_header_pos.x + m_header_current_size.x, m_header_pos.y + m_header_current_size.y - 2.5f),
+			m_selected_color,
+			5.f);
+	}
+
+	void gui::draw_submenus_window()
+	{
+		draw_rect(m_submenus_pos, m_submenus_size, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+		auto& submenus = m_menu.get_submenus();
+
+		m_current_submenu = m_menu.selected_id();
+		m_submenu_count = m_menu.counter();
+
+		for (auto& submenu : submenus) {
+			draw_submenu(*submenu);
+		}
+	}
+
+	void gui::draw_options_window()
+	{
+		draw_rect(m_options_pos, m_options_size, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+		auto& options = m_menu.get_selected_submenu().get_options();
+
+		m_current_option = m_menu.get_selected_submenu().selected_id();
+		m_option_count = m_menu.get_selected_submenu().counter();
+
+		for (auto& option : options) {
+			draw_option(*option);
+		}
+	}
+
+	void gui::draw_settings_window()
+	{
+		draw_rect(m_settings_pos, m_settings_size, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+		auto& settings = m_menu.get_selected_submenu().get_selected_option().get_settings();
+
+		m_current_setting = m_menu.get_selected_submenu().get_selected_option().selected_id();
+		m_setting_count = m_menu.get_selected_submenu().get_selected_option().counter();
+
+		for (auto& setting : settings) {
+			draw_setting(*setting);
+		}
+	}
+
+	void gui::calculate_color(
+		std::uint32_t id, std::uint32_t current_id,
+		ImVec4& color, const ImVec4& selected_color, const ImVec4& near_selected_color, const ImVec4& non_selected_color)
+	{
+		if (id == current_id)
+		{
+			slide_to(color.x, selected_color.x);
+			slide_to(color.y, selected_color.y);
+			slide_to(color.z, selected_color.z);
+			slide_to(color.w, selected_color.w);
+		}
+		else {
+			slide_to(color.x, non_selected_color.x, 100);
+			slide_to(color.y, non_selected_color.y, 100);
+			slide_to(color.z, non_selected_color.z, 100);
+			slide_to(color.w, non_selected_color.w, 100);
+		}
+	}
+
+	void gui::draw_submenu(submenu& submenu_elem)
+	{
+		bool draw_{ false };
+		ImVec2 pos_{}, size_{};
+
+		if (submenu_elem.id() < max_submenus && m_submenu_count < max_submenus)
+		{
+			draw_ = true;
+			pos_ = ImVec2(m_submenus_pos.x, m_submenus_pos.y + (m_submenus_size.y / block_delimeter) * submenu_elem.id());
+		}
+		else if (submenu_elem.id() > (m_current_submenu - max_submenus) && submenu_elem.id() <= m_current_submenu)
+		{
+			draw_ = true;
+			pos_ = ImVec2(m_submenus_pos.x, m_submenus_pos.y + (m_submenus_size.y / block_delimeter) * (submenu_elem.id() - (m_current_submenu - max_submenus)));
+		}
+		if (draw_)
+		{
+			size_ = ImVec2(m_submenus_size.x, m_submenus_size.y / block_delimeter);
+			calculate_color(submenu_elem.id(), m_current_submenu,
+				submenu_elem.get_block_color(), m_selected_color, m_near_selected_color, m_non_selected_color);
+
+			draw_rect(pos_, size_, submenu_elem.get_block_color());
+			draw_text(TRANSLATE(submenu_elem.name()), pos_, size_);
+		}
+	}
+
+	void gui::draw_option(option& option)
+	{
+		bool draw_{ false };
+		ImVec2 pos_{}, size_{};
+
+		if (option.id() < max_options && m_option_count < max_options)
+		{
+			draw_ = true;
+			pos_ = ImVec2(m_options_pos.x, m_options_pos.y + (m_options_size.y / block_delimeter) * option.id());
+		}
+		else if (option.id() > (m_current_option - max_options) && option.id() <= m_current_option)
+		{
+			draw_ = true;
+			pos_ = ImVec2(m_options_pos.x, m_options_pos.y + (m_options_size.y / block_delimeter) * (option.id() - (m_current_option - max_options)));
+		}
+		if (draw_)
+		{
+			size_ = ImVec2(m_options_size.x, m_options_size.y / block_delimeter);
+
+			calculate_color(option.id(), m_current_option,
+				option.get_block_color(), m_selected_color, m_near_selected_color, m_non_selected_color);
+
+			draw_rect(pos_, size_, option.get_block_color());
+			draw_text(TRANSLATE(option.name()), pos_, size_);
+		}
+	}
+
+	void gui::draw_setting(option_setting& setting)
+	{
+		bool draw_{ false };
+		ImVec2 pos_{}, size_{};
+
+
+		if (setting.id() < max_settings && m_setting_count < max_settings)
+		{
+			draw_ = true;
+			pos_ = ImVec2(m_settings_pos.x, m_settings_pos.y + (m_settings_size.y / block_delimeter) * setting.id());
+		}
+		else if (setting.id() > (m_current_setting - max_settings) && setting.id() <= m_current_setting)
+		{
+			draw_ = true;
+			pos_ = ImVec2(m_settings_pos.x,
+				m_settings_pos.y + m_settings_size.y / block_delimeter * (setting.id() - (m_current_setting - max_settings)));
+		}
+		if (draw_)
+		{
+			size_ = ImVec2(m_submenus_size.x, m_submenus_size.y / block_delimeter);
+
+			calculate_color(setting.id(), m_current_setting,
+				setting.get_block_color(), m_selected_color, m_near_selected_color, m_non_selected_color);
+
+			draw_rect(pos_, size_, setting.get_block_color());
+			draw_text(TRANSLATE(setting.name()), pos_, size_);
+		}
+	}
+
 	void gui::background_overlay()
 	{
 		static float m_bg_alpha{ 0.f };
@@ -383,349 +685,18 @@ namespace extremum::core
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, m_bg_alpha));
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 
 		ImGuiIO& io = ImGui::GetIO();
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
-		if (ImGui::Begin("##BackgroundOverlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs))
+		if (ImGui::Begin("##background_overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs))
 		{
-			ImGuiWindow* window = ImGui::GetCurrentWindow();
-			if (m_startup_anim) {
-				ImGui::PushFont(g_renderer->m_font_startup);
-
-				static bool line_inited{ false };
-				static ImVec2 fl_p_min;
-				static ImVec2 fl_p_max;
-				static ImVec2 fl_p_max_end;
-				static ImVec2 text_size;
-
-				static std::chrono::system_clock::time_point timer_start;
-				static bool timer_inited{ false };
-
-
-				switch (m_startup_anim_pos)
-				{
-				case extremum::core::BG_IN: {
-					if (m_bg_alpha != 0.5f)
-						slide_to(m_bg_alpha, 0.5f);
-					else
-						m_startup_anim_pos = extremum::core::TEXT_IN;
-				} break;
-				case extremum::core::TEXT_IN: {
-					if (m_font_alpha != 1.f, m_font_scale != 1.f) {
-						slide_to(m_font_alpha, 1.f);
-						slide_to(m_font_scale, 1.f);
-					}
-					else
-						m_startup_anim_pos = extremum::core::UNDER_LINE_IN;
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, m_font_alpha));
-					ImGui::SetWindowFontScale(m_font_scale);
-					text_size = ImGui::CalcTextSize("EXTREMUM");
-					ImGui::SetCursorPos(ImVec2(io.DisplaySize.x / 2 - text_size.x / 2, io.DisplaySize.y / 2 - text_size.y / 2));
-					ImGui::Text("EXTREMUM");
-					ImGui::PopStyleColor();
-				} break;
-				case extremum::core::UNDER_LINE_IN: {
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
-					ImGui::SetWindowFontScale(1.f);
-					text_size = ImGui::CalcTextSize("EXTREMUM");
-					ImGui::SetCursorPos(ImVec2(io.DisplaySize.x / 2 - text_size.x / 2, io.DisplaySize.y / 2 - text_size.y / 2));
-					ImGui::Text("EXTREMUM");
-					ImGui::PopStyleColor();
-					if (!line_inited) {
-						fl_p_min = fl_p_max = ImVec2(io.DisplaySize.x / 2 - text_size.x / 2, io.DisplaySize.y / 2 + text_size.y / 2 + 30.f);
-						fl_p_max_end = ImVec2(io.DisplaySize.x / 2 + text_size.x / 2, io.DisplaySize.y / 2 + text_size.y / 2 + 30.f);
-						line_inited = true;
-					}
-					window->DrawList->AddLine(fl_p_min, fl_p_max, IM_COL32(255, 255, 255, 255), 10.f);
-					if (fl_p_max.x != fl_p_max_end.x)
-						slide_to(fl_p_max.x, fl_p_max_end.x);
-					else
-						m_startup_anim_pos = extremum::core::UNDER_LINE_OUT;
-				} break;
-				case extremum::core::TEXT_WAIT: {
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
-					ImGui::SetWindowFontScale(1.f);
-					text_size = ImGui::CalcTextSize("EXTREMUM");
-					ImGui::SetCursorPos(ImVec2(io.DisplaySize.x / 2 - text_size.x / 2, io.DisplaySize.y / 2 - text_size.y / 2));
-					ImGui::Text("EXTREMUM");
-					ImGui::PopStyleColor();
-					window->DrawList->AddLine(fl_p_min, fl_p_max, IM_COL32(255, 255, 255, 255), 10.f);
-					if (!timer_inited) {
-						timer_start = std::chrono::system_clock::now();
-						timer_inited = true;
-					}
-					std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - timer_start;
-					if (elapsed_seconds.count() >= 1.5f)
-						m_startup_anim_pos = extremum::core::UNDER_LINE_OUT;
-				} break;
-				case extremum::core::UNDER_LINE_OUT: {
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
-					ImGui::SetWindowFontScale(1.f);
-					text_size = ImGui::CalcTextSize("EXTREMUM");
-					ImGui::SetCursorPos(ImVec2(io.DisplaySize.x / 2 - text_size.x / 2, io.DisplaySize.y / 2 - text_size.y / 2));
-					ImGui::Text("EXTREMUM");
-					ImGui::PopStyleColor();
-					window->DrawList->AddLine(fl_p_min, fl_p_max, IM_COL32(255, 255, 255, 255), 10.f);
-					if (fl_p_min.x != fl_p_max_end.x)
-						slide_to(fl_p_min.x, fl_p_max_end.x);
-					else
-						m_startup_anim_pos = extremum::core::TEXT_OUT;
-				} break;
-				case extremum::core::TEXT_OUT: {
-					if (m_font_alpha != 0.f, m_font_scale != 0.1f) {
-						slide_to(m_font_alpha, 0.f);
-						slide_to(m_font_scale, 0.1f);
-					}
-					else
-						m_startup_anim_pos = extremum::core::BG_OUT;
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, m_font_alpha));
-					ImGui::SetWindowFontScale(m_font_scale);
-					text_size = ImGui::CalcTextSize("EXTREMUM");
-					ImGui::SetCursorPos(ImVec2(io.DisplaySize.x / 2 - text_size.x / 2, io.DisplaySize.y / 2 - text_size.y / 2));
-					ImGui::Text("EXTREMUM");
-					ImGui::PopStyleColor();
-				} break;
-				case extremum::core::BG_OUT: {
-					ImGui::SetWindowFontScale(1.f);
-					if (m_bg_alpha != 0.f)
-						slide_to(m_bg_alpha, 0.f);
-					else
-						m_startup_anim = false;
-				} break;
-				default:
-					m_startup_anim = false;
-					break;
-				}
-				ImGui::PopFont();
-			}
-			else {
-
-			}
 			ImGui::End();
 		}
 		ImGui::PopStyleColor();
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
-	}
-
-	/// <summary>
-	/// Drawing functions
-	/// </summary>
-	bool gui::button(std::string text, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		++m_button_counter;
-
-		std::string text_ = TRANSLATE(text);
-		if (vip) text_ = fmt::format("{} [VIP]", TRANSLATE(text));
-
-		bool return_bool{ false };
-		if (m_current_button == m_button_counter) {
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.f));
-			if (ImGui::Button(text_.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), button_height)) || m_pressed) {
-				if (!vip || vip && m_vip) {
-					return_bool = true;
-					g_fiber_pool->queue_job(action);
-				}
-			}
-			ImGui::PopStyleColor();
-		}
-		else
-			ImGui::Button(text_.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), button_height));
-
-		if (ImGui::IsItemHovered()) {
-			m_current_button = m_button_counter;
-			m_hovered_id = ImGui::GetHoveredID();
-			if (!vip || vip && m_vip) 
-				on_hover();
-		}
-		return return_bool;
-	}
-	bool gui::button(std::string text, std::string description, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		bool ret = button(text, vip, action, on_hover);
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip(description.c_str());
-		return ret;
-	}
-
-	bool gui::menu_option(std::string text, sub_menus next_level, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		ImGuiWindow* m_current = ImGui::GetCurrentWindow();
-		bool ret = button(text, vip, action, on_hover);
-
-		float height = button_height * 0.6;
-		float width = height;
-		float offset_y = (button_height - height) / 2;
-		auto current_pos = m_current->Pos;
-		if (m_menu_icons.find("arrow") != m_menu_icons.end())
-			m_current->DrawList->AddImage(
-				(ImTextureID)m_menu_icons["arrow"], 
-				ImVec2(current_pos.x + 400.f - width * 1.5, current_pos.y + (ImGui::GetCursorPosY() - ImGui::GetScrollY()) - offset_y - height),
-				ImVec2(current_pos.x + 400.f - width * 0.5, current_pos.y + (ImGui::GetCursorPosY() - ImGui::GetScrollY()) - offset_y));
-
-		if (ret) {
-			move_menu(next_level);
-			if (m_subtitles.find(next_level) == m_subtitles.end())
-				m_subtitles.insert(std::pair(next_level, text));
-		}
-		return ret;
-	}
-	bool gui::menu_option(std::string text, sub_menus next_level, std::string description, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		bool ret = menu_option(text, next_level, vip, action, on_hover);
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip(description.c_str());
-		return ret;
-	}
-	bool gui::menu_option(std::string text, std::string icon, sub_menus next_level, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		bool ret{ false };
-		if (m_menu_icons.find(icon) != m_menu_icons.end()) {
-			ImGuiWindow* m_current = ImGui::GetCurrentWindow();
-			ret = menu_option("", next_level, vip, action, on_hover);
-			if (ret)
-				if (m_subtitles.find(next_level) != m_subtitles.end())
-					m_subtitles[next_level] = text;
-			float height = button_height * 0.7;
-			float width = height;
-			float offset_y = (button_height - height) / 2;
-			auto current_pos = m_current->Pos;
-
-			m_current->DrawList->AddImage(
-				(ImTextureID)m_menu_icons[icon],
-				ImVec2(current_pos.x + width * 1.5, current_pos.y + (ImGui::GetCursorPosY() - ImGui::GetScrollY()) - offset_y - height),
-				ImVec2(current_pos.x + width * 0.5, current_pos.y + (ImGui::GetCursorPosY() - ImGui::GetScrollY()) - offset_y));
-
-			auto cursor_pos = ImGui::GetCursorPos();
-			auto text_size = ImGui::CalcTextSize(text.c_str());
-			ImGui::SetCursorPos({ width * 2, ImGui::GetCursorPosY() - button_height / 2 - text_size.y / 2});
-
-			std::string text_ = TRANSLATE(text);
-			if (vip) text_ = fmt::format("{} [VIP]", TRANSLATE(text));
-
-			if (m_current_button == m_button_counter)
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.01f, 0.01f, 0.01f, 1.00f));
-			ImGui::Text(text_.c_str());
-			if (m_current_button == m_button_counter)
-				ImGui::PopStyleColor();
-			ImGui::SetCursorPos(cursor_pos);
-		} else
-			ret = menu_option(text, next_level, vip, action, on_hover);
-		return ret;
-	}
-	bool gui::menu_option(std::string text, std::string icon, sub_menus next_level, std::string description, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		bool ret = menu_option(text, icon, next_level, vip, action, on_hover);
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip(description.c_str());
-		return ret;
-	}
-	
-	bool gui::toggle(std::string text, bool &_boolean, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		ImGuiWindow* m_current = ImGui::GetCurrentWindow();
-		static std::map<std::uint32_t, std::uint32_t> toggle_position;
-		static std::map<std::uint32_t, std::chrono::system_clock::time_point> timers;
-		bool ret = button(text, vip, action, on_hover);
-
-		std::uint32_t hash = rage::joaat(text.c_str());
-
-		if (toggle_position.find(hash) == toggle_position.end())
-			toggle_position.insert(std::pair(hash, _boolean ? 0 : m_toggle.size() - 1));
-		if (timers.find(hash) == timers.end())
-			timers.insert(std::pair(hash, std::chrono::system_clock::now()));
-
-		if ((_boolean && toggle_position[hash] > 0) || (!_boolean && toggle_position[hash] < m_toggle.size() - 1))
-		{
-			std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - timers[hash];
-			if (elapsed_seconds.count() >= 0.019)
-			{
-				if (_boolean && toggle_position[hash] > 0)
-					--toggle_position[hash];
-				else if (!_boolean && toggle_position[hash] < m_toggle.size() - 1)
-					++toggle_position[hash];
-				timers[hash] = std::chrono::system_clock::now();
-			}
-		}
-
-		float height = button_height * 0.8;
-		float width = height * 1.5;
-		float offset_y = (button_height - height) / 2;
-
-		auto current_pos = m_current->Pos;
-
-		auto p_min = ImVec2(current_pos.x + 400.f - width * 1.5, current_pos.y + (ImGui::GetCursorPosY() - ImGui::GetScrollY()) - offset_y - height);
-		auto p_max = ImVec2(current_pos.x + 400.f - width * 0.5, current_pos.y + (ImGui::GetCursorPosY() - ImGui::GetScrollY()) - offset_y);
-
-		m_current->DrawList->AddImage((ImTextureID)m_toggle.at(toggle_position[hash]), p_min, p_max);
-		
-		if (ret)
-			_boolean ^= 1;
-		return ret;
-	}
-	bool gui::toggle(std::string text, bool& _boolean, std::string description, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		bool ret = toggle(text, vip, _boolean, action, on_hover);
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip(description.c_str());
-		return ret;
-	}
-
-	template<typename NumberType>
-	bool gui::number(std::string text, NumberType& _number, NumberRange<NumberType> range, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		std::string text_ = TRANSLATE(text);
-		if (vip) text_ = fmt::format("{} [VIP]", TRANSLATE(text));
-
-		++m_button_counter;
-		// Get Variables
-		ImGuiWindow* m_current = ImGui::GetCurrentWindow();
-		auto& io = ImGui::GetIO();
-		auto mouse_pos = ImGui::GetMousePos();
-		auto text_size = ImGui::CalcTextSize(text.c_str());
-		auto cursor_pos = ImGui::GetCursorPos();
-		auto cursor_pos_end = ImVec2(cursor_pos.x, cursor_pos.y + button_height);
-		
-		auto p_min = ImVec2(m_current->Pos.x + cursor_pos.x, m_current->Pos.y + cursor_pos.y - ImGui::GetScrollY());
-		auto p_max = ImVec2(m_current->Pos.x + m_current->Size.x, m_current->Pos.y + cursor_pos_end.y - ImGui::GetScrollY());
-
-		if (mouse_pos.x > p_min.x && mouse_pos.x < p_max.x && mouse_pos.y > p_min.y && mouse_pos.y < p_max.y)
-		{
-			m_current_button = m_button_counter;
-		}
-		bool on_this = m_current_button == m_button_counter;
-		if (on_this) {
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.f));
-		}
-		// Draw Text
-		{
-			ImGui::SetCursorPos({ button_height * 0.8f, cursor_pos.y + button_height / 2 - text_size.y / 2 });
-			ImGui::Text(text_.c_str());
-		}
-		// Draw number slider
-		{
-			ImGui::SetNextItemWidth(menu_size_visible.x / 2 - button_height * 0.8f);
-			ImGui::SetCursorPos({ menu_size_visible.x / 2, cursor_pos_end.y - button_height / 4 * 3 });
-			if (std::is_integral<NumberType>::value)
-				ImGui::DragInt(fmt::format("\t\t{}", text).c_str(), (int*)&_number, (int)range.step, (int)range.min, (int)range.max, "< %d >");
-			if (std::is_floating_point<NumberType>::value)
-				ImGui::DragFloat(fmt::format("\t\t{}", text).c_str(), (float*)&_number, (float)range.step, (float)range.min, (float)range.max, "< %.2f >");
-			ImGui::SetCursorPos(cursor_pos_end);
-		}
-		if (on_this) {
-			ImGui::PopStyleColor();
-		}
-		return (on_this && (m_pressed));
-	}
-	template<typename NumberType>
-	bool gui::number(std::string text, NumberType& _number, NumberRange<NumberType> range, std::string description, bool vip, std::function<void()> action, std::function<void()> on_hover)
-	{
-		bool ret = number<NumberType>(text, _number, range, action, on_hover);
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip(description.c_str());
-		return ret;
 	}
 
 	void gui::check_controlls()
@@ -749,9 +720,10 @@ namespace extremum::core
 					m_down_pressed = true;
 
 				up_down_timer = std::chrono::system_clock::now();
+				g_fiber_pool->queue_job([] { AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", 0); });
 			}
 		}
-		if (left_right_elapsed.count() >= 0.100)
+		if (left_right_elapsed.count() >= 0.500)
 		{
 			bool _left = iskeypressed(VK_NUMPAD4) || iskeypressed(VK_LEFT);
 			bool _right = iskeypressed(VK_NUMPAD6) || iskeypressed(VK_RIGHT);
@@ -762,6 +734,7 @@ namespace extremum::core
 					m_right_pressed = true;
 
 				left_right_timer = std::chrono::system_clock::now();
+				g_fiber_pool->queue_job([] { AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", 0); });
 			}
 		}
 		if (press_elapsed.count() >= 0.100)
@@ -776,25 +749,19 @@ namespace extremum::core
 					m_back = true;
 
 				press_timer = std::chrono::system_clock::now();
+				g_fiber_pool->queue_job([] { AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", 0); });
 			}
 		}
-
-		if (m_opened) {
-			if (m_up_pressed) {
-				if (m_current_button == 1) m_current_button = m_button_counter;
-				else --m_current_button;
-			}
-			else if (m_down_pressed) {
-				if (m_current_button == m_button_counter) m_current_button = 1;
-				else ++m_current_button;
-			}
-			else if (m_back) {
-				back_menu();
-			}
-		}
-		m_button_counter = 0;
 	}
-
+	void gui::reset_controlls()
+	{
+		m_pressed = false;
+		m_back = false;
+		m_up_pressed = false;
+		m_down_pressed = false;
+		m_left_pressed = false;
+		m_right_pressed = false;
+	}
 	template<typename _Ty>
 	void gui::slide_to(_Ty& x, _Ty y, int speed)
 	{
@@ -807,28 +774,5 @@ namespace extremum::core
 			x -= (0.01 + z / speed);
 		}
 		else x = y;
-	}
-	void gui::dx_on_disable()
-	{
-		slide_to(menu_size_visible.y, 0.f);
-	}
-
-	void gui::move_menu(sub_menus level)
-	{
-		m_menu_levels[m_menu_level] = m_current_menu;
-		m_menu_option_level[m_menu_level] = m_current_button;
-		++m_menu_level;
-		m_current_menu = level; 
-		m_current_button = 1;
-	}
-	void gui::back_menu()
-	{
-		if (m_menu_level > 0) {
-			--m_menu_level;
-			m_current_menu = m_menu_levels[m_menu_level];
-			m_current_button = m_menu_option_level[m_menu_level];
-		}
-		else if (m_opened)
-			m_opened = false;
 	}
 }

@@ -11,6 +11,7 @@
 
 BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 {
+	srand(time(0));
 	using namespace extremum::core;
 	if (reason == DLL_PROCESS_ATTACH)
 	{

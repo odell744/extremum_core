@@ -32,16 +32,22 @@ namespace extremum::core
 		if (auto it = m_handler_cache.find(hash); it != m_handler_cache.end())
 		{
 			rage::scrNativeHandler handler = it->second;
-
+			
+#ifdef _DEBUG
+			handler(&m_call_context);
+			g_pointers->m_fix_vectors(&m_call_context);
+#endif
+#ifndef _DEBUG
 			__try
 			{
-				handler(&m_call_context);
-				g_pointers->m_fix_vectors(&m_call_context);
+			handler(&m_call_context);
+			g_pointers->m_fix_vectors(&m_call_context);
 			}
 			__except (EXCEPTION_EXECUTE_HANDLER)
 			{
 				LOG_ERROR("Exception caught while trying to call 0x{:X} native.", hash);
 			}
+#endif
 		}
 		else
 		{
